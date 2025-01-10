@@ -5,4 +5,5 @@ There are 3 site sections to testing:
 - feed of user's posts
 - feed of not user's posts
 Check lists and detected bugs are inside 2 .xlsx files - for web and api parts.
+
 Also this project contains postman collection for api part testing.    
