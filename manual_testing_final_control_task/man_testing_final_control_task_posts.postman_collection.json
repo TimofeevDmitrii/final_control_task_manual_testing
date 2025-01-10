@@ -1,0 +1,4096 @@
+{
+	"info": {
+		"_postman_id": "79ffaa73-3593-48fb-843f-5ac2c32999be",
+		"name": "man_testing_final_control_task_posts",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34727635",
+		"_collection_link": "https://www.postman.com/dimatimoha2014/workspace/testing-api-gb/collection/34727635-79ffaa73-3593-48fb-843f-5ac2c32999be?action=share&source=collection_link&creator=34727635"
+	},
+	"item": [
+		{
+			"name": "user_posts",
+			"item": [
+				{
+					"name": "1_get_user_posts_unauthorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Тест 1.1 | Отправка запроса без X-Auth-Token в заголовках: статус код 401\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 1.2 | Отправка запроса без X-Auth-Token в заголовках: текст сообщения\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Auth header required X-Auth-Token\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=createdAt&order=ASC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2_get_user_posts_unauthorized_2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Тест 2.1 | Отправка запроса c несуществующим токеном в X-Auth-Token: статус код 401\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 2.2 | Отправка запроса c несуществующим токеном в X-Auth-Token: текст сообщения\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Authentication request could not be processed due to a system problem.\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "f3771510b5fcd0a694ee97f96e0f06b8",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=createdAt&order=ASC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user_login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let userData = pm.response.json()\r",
+									"pm.collectionVariables.set(\"X-Auth-Token\", userData.token)\r",
+									"pm.collectionVariables.set(\"userId\", userData.id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{userLogin}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{userPassword}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://test-stand.gb.ru/gateway/login",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"gateway",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3_4_get_user_posts_no_query_params",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 3 | Использование токена пользователя, полученного при авторизации: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 4.1 | Отправка запроса без query params: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 4.2 | Отправка запроса без query params: в ответе по дефолту первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 4.3 | Отправка запроса без query params: в ответе по дефолту только посты автора (authorId = userId)\", function () {\r",
+									"    var isUserPosts = true;\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\");\r",
+									"    for (let i = 0; i < postsData.length; i++){\r",
+									"        if (!(postsData[i][\"authorId\"] == userIdForCheck)){\r",
+									"            isUserPosts = false;\r",
+									"            break;\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\";\r",
+									"var successfulParseCases = [];\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])));\r",
+									"var allDatesIsValid = successfulParseCases.every(true);\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 4.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 4.5 | Сортировка постов по полю createdAt - ASC (по дефолту от старых к новым):\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"ASC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5_get_user_posts_empty_query_params",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 5.1 | Отправка запроса c пустыми query params: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 5.2 | Отправка запроса с пустыми query params: в ответе по дефолту первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 5.3 | Отправка запроса с пустыми query params: в ответе по дефолту только посты автора (authorId = userId)\", function () {\r",
+									"    var isUserPosts = true\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\")\r",
+									"    for  (let i = 0; i < postsData.length; i++){\r",
+									"        if (!(postsData[i][\"authorId\"] == userIdForCheck)){\r",
+									"            isUserPosts = false\r",
+									"            break\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\"\r",
+									"var successfulParseCases = []\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])))\r",
+									"var allDatesIsValid = successfulParseCases.every(true)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 5.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 5.5 | Сортировка постов по полю createdAt - ASC (по дефолту от старых к новым):\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"ASC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=&order=&page=",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": ""
+								},
+								{
+									"key": "order",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6_get_user_posts_page_is_minus_1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 6.1 | Отправка запроса c query param page=-1: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 6.2 | Отправка запроса c query param page=-1: в ответе по дефолту первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 6.3 | Отправка запроса c query param page=-1: в ответе по дефолту только посты автора (authorId = userId)\", function () {\r",
+									"    var isUserPosts = true\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\")\r",
+									"    for  (let i = 0; i < postsData.length; i++){\r",
+									"        if (!(postsData[i][\"authorId\"] == userIdForCheck)){\r",
+									"            isUserPosts = false\r",
+									"            break\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\"\r",
+									"var successfulParseCases = []\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])))\r",
+									"var allDatesIsValid = successfulParseCases.every(true)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 6.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 6.5 | Сортировка постов по полю createdAt - ASC:\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"ASC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=createdAt&order=ASC&page=-1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "-1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7_get_user_posts_page_0",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var postsData = pm.response.json().data;\r",
+									"\r",
+									"pm.test(\"Тест 7.1 | Отправка запроса query param \\\"page\\\"=0: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 7.2 | Отправка запроса query param \\\"page\\\"=0: количество постов в списке data.length=0\", function () {\r",
+									"    pm.expect(postsData.length).to.eql(0);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=createdAt&order=ASC&page=0",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8_9_get_user_posts_page_is_1_and_last",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function makeRequest(setOptions) {\r",
+									"  return new Promise((resolve, reject) => {\r",
+									"    pm.sendRequest(setOptions, (err, res) => {\r",
+									"      if (err) {\r",
+									"        reject(err);\r",
+									"      } else {\r",
+									"        resolve(res);\r",
+									"      }\r",
+									"    });\r",
+									"  });\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 8.1 | Отправка запроса c query param page=1: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 8.2 | Отправка запроса c query param page=1: prevPage=1\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"var postsTotalCount = jsonData.meta.count;\r",
+									"var postsOnePageCount = 4; // отталкиваемся от текущей реализации в количестве постов на одной странице, иначе не получим все страницы с постами пользователя\r",
+									"var requestsCount = postsTotalCount % postsOnePageCount ? Math.floor(postsTotalCount / postsOnePageCount) + 1 : postsTotalCount / postsOnePageCount; // число необходимых запроов, чтобы получить все посты\r",
+									"\r",
+									"(async () =>  {\r",
+									"\t\tconst options = {\r",
+									"\t\t\t\turl : \"https://test-stand.gb.ru/api/posts?sort=createdAt&order=ASC&page=\" + requestsCount,\r",
+									"\t\t\t\tmethod : \"GET\",\r",
+									"\t\t\t\theader : {\"X-Auth-Token\" : pm.collectionVariables.get(\"X-Auth-Token\")}\r",
+									"\t\t};\r",
+									"\r",
+									"  \tawait makeRequest(options).then(response => {\r",
+									"        let meta = response.json().meta;\r",
+									"\t\t\t\tpm.test(\"Тест 9.1 | Отправка запроса c query param page=lastPage: статус код 200\", function () {\r",
+									"    \t\t\t\tpm.response.to.have.status(200);\r",
+									"\t\t\t\t});\r",
+									"        pm.test(\"Тест 9.2 | Получение последней страницы: (\\\"prevPage\\\" = lastPage-1) and (\\\"nextPage\\\" = null)\", function (){\r",
+									"            var pagesIsRight = (meta.prevPage == requestsCount - 1) && (meta.nextPage === null)\r",
+									"            pm.expect(pagesIsRight).to.eql(true)\r",
+									"        })\r",
+									"\t\t});\r",
+									"\r",
+									"})();\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=createdAt&order=ASC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "10_get_user_posts_page_is_999999909",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 10.1 | Отправка запроса c query param page=999999909: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 10.2 | Отправка запроса c query param page=999999909: количество постов в списке data.length=0\", function () {\r",
+									"    pm.expect(postsData.length).to.eql(0);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=createdAt&order=ASC&page=999999909",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "999999909"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "11_get_user_posts_number_of_posts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json()\r",
+									"var postsData = jsonData.data;\r",
+									"var postsNumberOnePage = 10 // количество своих постов на одной странице в овтете от API \r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 11 | Отправка запроса на свои посты, query param \\\"page\\\"=1: количество СВОИХ постов в списке data.length=10 на одной странице\", function () {\r",
+									"    pm.expect(postsData.length).to.eql(postsNumberOnePage);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=createdAt&order=ASC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "12_13_14_check_user_posts_ASC_sort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function makeRequest(setOptions) {\r",
+									"  return new Promise((resolve, reject) => {\r",
+									"    pm.sendRequest(setOptions, (err, res) => {\r",
+									"      if (err) {\r",
+									"        reject(err);\r",
+									"      } else {\r",
+									"        resolve(res);\r",
+									"      }\r",
+									"    });\r",
+									"  });\r",
+									"}\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"var fieldAuthorName = \"authorId\";\r",
+									"var fieldDateName = \"createdAt\";\r",
+									"\r",
+									"var postsTotalCount = jsonData.meta.count;\r",
+									"var postsOnePageCount = 4; // отталкиваемся от текущей реализации в количестве постов на одной странице, иначе не получим все страницы с постами пользователя\r",
+									"var requestsCount = postsTotalCount % postsOnePageCount ? Math.floor(postsTotalCount / postsOnePageCount) + 1 : postsTotalCount / postsOnePageCount; // число необходимых запроов, чтобы получить все посты\r",
+									"\r",
+									"var allPosts = []; // сюда будем сохранять объекты-посты для проверки\r",
+									"for (let j=0; j < postsData.length; j++){\r",
+									"    allPosts.push(postsData[j])\r",
+									"}\r",
+									"\r",
+									"(async () =>  {\r",
+									"    // i=2 т.к. первый запрос на первую страницу уже выполнен\r",
+									"    for (let i=2; i<=requestsCount; i++){\r",
+									"        const options = {\r",
+									"            url : \"https://test-stand.gb.ru/api/posts?sort=createdAt&order=ASC&page=\" + i,\r",
+									"            method : \"GET\",\r",
+									"            header : {\"X-Auth-Token\" : pm.collectionVariables.get(\"X-Auth-Token\")}\r",
+									"        };\r",
+									"        await makeRequest(options).then(response => {\r",
+									"            let jsData = response.json().data;\r",
+									"            for (let j=0; j < jsData.length; j++){\r",
+									"                allPosts.push(jsData[j])\r",
+									"            }\r",
+									"        });\r",
+									"    }\r",
+									"\r",
+									"    var successfulParseCases = [];\r",
+									"    allPosts.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])));\r",
+									"    var allDatesIsValid = successfulParseCases.every(true);\r",
+									"\r",
+									"    pm.test(\"Тест 12(1)  | Проверка формата даты и корректности даты\", function(){\r",
+									"        pm.expect(allDatesIsValid).to.eql(true)\r",
+									"    })\r",
+									"\r",
+									"\r",
+									"    pm.test(\"Тест 13 | Получение всех постов пользователя, order=ASC : Сортировка постов по полю createdAt - от старых к новым):\", function(){\r",
+									"        var isSorted = true\r",
+									"        if (allDatesIsValid){\r",
+									"            isSorted = isSortedByDate(allPosts, fieldDateName, \"ASC\")\r",
+									"        } else {\r",
+									"            isSorted = false\r",
+									"        }\r",
+									"        pm.expect(isSorted).to.eql(true)\r",
+									"    })\r",
+									"\r",
+									"\r",
+									"    pm.test(\"Тест 14 | Все посты пользователя (ASC): в ответе только посты автора (authorId = userId)\", function () {\r",
+									"        var isUserPosts = true;\r",
+									"        var userIdForCheck = pm.collectionVariables.get(\"userId\");\r",
+									"        for (let k = 0; k < allPosts.length; k++){\r",
+									"            if (!(allPosts[k][fieldAuthorName] == userIdForCheck)){\r",
+									"                isUserPosts = false;\r",
+									"                break;\r",
+									"            }\r",
+									"        }\r",
+									"        pm.expect(isUserPosts).to.eql(true);\r",
+									"    });\r",
+									"\r",
+									"\r",
+									"\r",
+									"})();\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=createdAt&order=ASC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "12_15_16_check_user_posts_DESC_sort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function makeRequest(setOptions) {\r",
+									"  return new Promise((resolve, reject) => {\r",
+									"    pm.sendRequest(setOptions, (err, res) => {\r",
+									"      if (err) {\r",
+									"        reject(err);\r",
+									"      } else {\r",
+									"        resolve(res);\r",
+									"      }\r",
+									"    });\r",
+									"  });\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function testFieldsAndTypesGetPosts(testName, jsResponsesList){\r",
+									"    pm.test(testName, function () {\r",
+									"        for (let i = 0; i < jsResponsesList.length; i++){\r",
+									"            pm.expect(jsResponsesList[i]).to.be.an('object');\r",
+									"            pm.expect(jsResponsesList[i].data).to.be.an('array').that.is.not.empty;\r",
+									"            for (let k = 0; k < jsResponsesList[i].data.length; k++){\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('id').that.is.an('number');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('title').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('description').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('content').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('authorId').that.is.an('number');\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage).to.be.an('object');\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage).to.have.property('id');\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage.id === null || typeof(jsResponsesList[i].data[k].mainImage.id) === 'number').to.eql(true);\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage).to.have.property('cdnUrl').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('updatedAt').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('createdAt').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('labels').that.is.an('array');\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('delayPublishTo');\r",
+									"                pm.expect(jsResponsesList[i].data[k].delayPublishTo === null || typeof(jsResponsesList[i].data[k].delayPublishTo) === 'string').to.eql(true);\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('draft').that.is.an('boolean');\r",
+									"            }\r",
+									"            pm.expect(jsResponsesList[i].meta).to.be.an('object');\r",
+									"\r",
+									"            pm.expect(jsResponsesList[i].meta).to.have.property('prevPage').that.is.an('string');\r",
+									"\r",
+									"            pm.expect(jsResponsesList[i].meta).to.have.property('nextPage');\r",
+									"            if ( i != jsResponsesList.length-1){\r",
+									"                pm.expect(typeof(jsResponsesList[i].meta.nextPage) === 'string').to.eql(true);\r",
+									"            } else {\r",
+									"                pm.expect(jsResponsesList[i].meta.nextPage === null).to.eql(true);\r",
+									"            }\r",
+									"\r",
+									"            pm.expect(jsResponsesList[i].meta).to.have.property('count').that.is.an('number');        \r",
+									"        }\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"var fieldAuthorName = \"authorId\";\r",
+									"var fieldDateName = \"createdAt\";\r",
+									"\r",
+									"var postsTotalCount = jsonData.meta.count;\r",
+									"var postsOnePageCount = 4; // отталкиваемся от текущей реализации в количестве постов на одной странице, иначе не получим все страницы с постами пользователя\r",
+									"var requestsCount = postsTotalCount % postsOnePageCount ? Math.floor(postsTotalCount / postsOnePageCount) + 1 : postsTotalCount / postsOnePageCount; // число необходимых запроов, чтобы получить все посты\r",
+									"\r",
+									"var allResponses = []; //сюда будем сохранять респонсы для проверки\r",
+									"allResponses.push(jsonData);\r",
+									"\r",
+									"\r",
+									"(async () =>  {\r",
+									"    // i=2 т.к. первый запрос на первую страницу уже выполнен\r",
+									"    for (let i=2; i<=requestsCount; i++){\r",
+									"        const options = {\r",
+									"            url : \"https://test-stand.gb.ru/api/posts?owner=&sort=createdAt&order=DESC&page=\" + i,\r",
+									"            method : \"GET\",\r",
+									"            header : {\"X-Auth-Token\" : pm.collectionVariables.get(\"X-Auth-Token\")}\r",
+									"        };\r",
+									"        await makeRequest(options).then(response => {\r",
+									"            let jsData = response.json();\r",
+									"            allResponses.push(jsData)\r",
+									"        });\r",
+									"    }\r",
+									"\r",
+									"    var allPosts = []; // сюда вытащим все посты объекты из респонсов\r",
+									"    allResponses.forEach(element => element[\"data\"].forEach(post => allPosts.push(post)));\r",
+									"\r",
+									"    var successfulParseCases = [];\r",
+									"    allPosts.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])));\r",
+									"    var allDatesIsValid = successfulParseCases.every(true);\r",
+									"\r",
+									"    \r",
+									"    pm.test(\"Тест 12(2) | Проверка формата даты и корректности даты\", function(){\r",
+									"        pm.expect(allDatesIsValid).to.eql(true)\r",
+									"    })\r",
+									"\r",
+									"\r",
+									"    pm.test(\"Тест 15 | Получение всех постов пользователя, query param order=DESC : Сортировка постов по полю createdAt - от новых к старых):\", function(){\r",
+									"        var isSorted = true\r",
+									"        if (allDatesIsValid){\r",
+									"            isSorted = isSortedByDate(allPosts, fieldDateName, \"DESC\")\r",
+									"        } else {\r",
+									"            isSorted = false\r",
+									"        }\r",
+									"        pm.expect(isSorted).to.eql(true)\r",
+									"    })\r",
+									"\r",
+									"\r",
+									"    testFieldsAndTypesGetPosts(\"Тест 16 | Получение всех постов пользователя (DESC): наличие всех полей в респонсах, их тип\", allResponses)\r",
+									"\r",
+									"\r",
+									"\r",
+									"})();\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=createdAt&order=DESC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "DESC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "17_get_user_posts_sort_is_id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 17.1 | Отправка запроса c query param sort=id: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 17.2 | Отправка запроса c query param sort=id: в ответе первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 17.3 | Отправка запроса c query param sort=id: в ответе только посты автора (authorId = userId)\", function () {\r",
+									"    var isUserPosts = true\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\")\r",
+									"    for  (let i = 0; i < postsData.length; i++){\r",
+									"        if (!(postsData[i][\"authorId\"] == userIdForCheck)){\r",
+									"            isUserPosts = false\r",
+									"            break\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\"\r",
+									"var successfulParseCases = []\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])))\r",
+									"var allDatesIsValid = successfulParseCases.every(true)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 17.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 17.5 | Сортировка постов по полю createdAt - ASC:\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"ASC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=id&order=ASC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "id"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "18_get_user_posts_order_is_123",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 18.1 | Отправка запроса c query param order=123: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 18.2 | Отправка запроса c query param order=123: в ответе первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 18.3 | Отправка запроса c query param order=123: в ответе только посты автора (authorId = userId)\", function () {\r",
+									"    var isUserPosts = true\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\")\r",
+									"    for  (let i = 0; i < postsData.length; i++){\r",
+									"        if (!(postsData[i][\"authorId\"] == userIdForCheck)){\r",
+									"            isUserPosts = false\r",
+									"            break\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\"\r",
+									"var successfulParseCases = []\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])))\r",
+									"var allDatesIsValid = successfulParseCases.every(true)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 18.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 18.5 | Сортировка постов по полю createdAt - ASC (от старых к новым):\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"ASC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=createdAt&order=123&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "123"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "19_get_user_posts_page_is_first",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 19.1 | Отправка запроса c query param page=first: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 19.2 | Отправка запроса c query param page=first: в ответе первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 19.3 | Отправка запроса c query param page=first: в ответе только посты автора (authorId = userId)\", function () {\r",
+									"    var isUserPosts = true\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\")\r",
+									"    for  (let i = 0; i < postsData.length; i++){\r",
+									"        if (!(postsData[i][\"authorId\"] == userIdForCheck)){\r",
+									"            isUserPosts = false\r",
+									"            break\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\"\r",
+									"var successfulParseCases = []\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])))\r",
+									"var allDatesIsValid = successfulParseCases.every(true)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 19.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 19.5 | Сортировка постов по полю createdAt - DESC:\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"DESC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?sort=createdAt&order=DESC&page=first",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "DESC"
+								},
+								{
+									"key": "page",
+									"value": "first"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "not_user_posts",
+			"item": [
+				{
+					"name": "1_get_not_user_posts_unauthorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Тест 1.1 | Отправка запроса без X-Auth-Token в заголовках: статус код 401\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 1.2 | Отправка запроса без X-Auth-Token в заголовках: текст сообщения\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Auth header required X-Auth-Token\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"X-Auth-Token\", \"\")"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ASC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2_get_not_user_posts_unauthorized_2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Тест 2.1 | Отправка запроса c несуществующим токеном в X-Auth-Token: статус код 401\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 2.2 | Отправка запроса c несуществующим токеном в X-Auth-Token: текст сообщения\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Authentication request could not be processed due to a system problem.\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "f3771510b5fcd0a694ee97f96e0f06b8",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=DESC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "DESC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user_login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let userData = pm.response.json()\r",
+									"pm.collectionVariables.set(\"X-Auth-Token\", userData.token)\r",
+									"pm.collectionVariables.set(\"userId\", userData.id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{userLogin}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{userPassword}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://test-stand.gb.ru/gateway/login",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"gateway",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3_4_get_not_user_posts_empty_query_params",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 3 | Использование токена пользователя, полученного при авторизации: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 4.1 | Отправка запроса c пустыми query params: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 4.2 | Отправка запроса с пустыми query params: в ответе первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 4.3 | Отправка запроса с пустыми query params: в ответе по дефолту только посты автора (authorId = userId)\", function () {\r",
+									"    var isUserPosts = true\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\")\r",
+									"    for  (let i = 0; i < postsData.length; i++){\r",
+									"        if (!(postsData[i][\"authorId\"] == userIdForCheck)){\r",
+									"            isUserPosts = false\r",
+									"            break\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\"\r",
+									"var successfulParseCases = []\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])))\r",
+									"var allDatesIsValid = successfulParseCases.every(true)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 4.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 4.5 | Сортировка постов по полю createdAt - ASC (по дефолту от старых к новым):\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"ASC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner&sort&order&page",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": null
+								},
+								{
+									"key": "sort",
+									"value": null
+								},
+								{
+									"key": "order",
+									"value": null
+								},
+								{
+									"key": "page",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5_get_not_user_posts_page_is_minus_1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 5.1 | Отправка запроса c query param page=-1: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 5.2 | Отправка запроса c query param page=-1: в ответе первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 5.3 | Отправка запроса c query param page=-1: в ответе чужие посты (authorId != userId)\", function () {\r",
+									"    var isNotUserPosts = true\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\")\r",
+									"    for  (let i = 0; i < postsData.length; i++){\r",
+									"        if (postsData[i][\"authorId\"] == userIdForCheck){\r",
+									"            isNotUserPosts = false\r",
+									"            break\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isNotUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\"\r",
+									"var successfulParseCases = []\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])))\r",
+									"var allDatesIsValid = successfulParseCases.every(true)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 5.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 5.5 | Сортировка постов по полю createdAt - ASC:\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"ASC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ASC&page=-1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "-1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6_get_not_user_posts_page_0",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var postsData = pm.response.json().data;\r",
+									"\r",
+									"pm.test(\"Тест 6.1 | Отправка запроса query param \\\"page\\\"=0: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 6.2 | Отправка запроса query param \\\"page\\\"=0: количество постов в списке data.length=0\", function () {\r",
+									"    pm.expect(postsData.length).to.eql(0);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ASC&page=0",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7_8_get_not_user_posts_page_is_1_and_last",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function makeRequest(setOptions) {\r",
+									"  return new Promise((resolve, reject) => {\r",
+									"    pm.sendRequest(setOptions, (err, res) => {\r",
+									"      if (err) {\r",
+									"        reject(err);\r",
+									"      } else {\r",
+									"        resolve(res);\r",
+									"      }\r",
+									"    });\r",
+									"  });\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 7.1 | Отправка запроса c query param page=1: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 7.2 | Отправка запроса c query param page=1: prevPage=1\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 7.3 | Отправка запроса c query param page=1: nextPage=2\", function () {\r",
+									"    pm.expect(jsonData.meta.nextPage).to.eql(2);\r",
+									"});\r",
+									"\r",
+									"var postsTotalCount = jsonData.meta.count;\r",
+									"var postsOnePageCount = 4; // отталкиваемся от текущей реализации в количестве постов на одной странице, иначе не получим все страницы с постами пользователя\r",
+									"var requestsCount = postsTotalCount % postsOnePageCount ? Math.floor(postsTotalCount / postsOnePageCount) + 1 : postsTotalCount / postsOnePageCount; // число необходимых запроов, чтобы получить все посты\r",
+									"\r",
+									"(async () =>  {\r",
+									"\t\tconst options = {\r",
+									"\t\t\t\turl : \"https://test-stand.gb.ru/api/posts?sort=createdAt&order=ASC&page=\" + requestsCount,\r",
+									"\t\t\t\tmethod : \"GET\",\r",
+									"\t\t\t\theader : {\"X-Auth-Token\" : pm.collectionVariables.get(\"X-Auth-Token\")}\r",
+									"\t\t};\r",
+									"\r",
+									"  \tawait makeRequest(options).then(response => {\r",
+									"        let meta = response.json().meta;\r",
+									"\t\t\t\tpm.test(\"Тест 8.1 | Отправка запроса c query param page=lastPage: статус код 200\", function () {\r",
+									"    \t\t\t\tpm.response.to.have.status(200);\r",
+									"\t\t\t\t});\r",
+									"        pm.test(\"Тест 8.2 | Получение последней страницы: (\\\"prevPage\\\" = lastPage-1) and (\\\"nextPage\\\" = null)\", function (){\r",
+									"            var pagesIsRight = (meta.prevPage == requestsCount - 1) && (meta.nextPage === null)\r",
+									"            pm.expect(pagesIsRight).to.eql(true)\r",
+									"        })\r",
+									"\t\t});\r",
+									"\r",
+									"})();\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ASC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "9_get_not_user_posts_page_is_999999909",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 9.1 | Отправка запроса c query param page=999999909: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 9.2 | Отправка запроса c query param page=999999909: количество постов в списке data.length=0\", function () {\r",
+									"    pm.expect(postsData.length).to.eql(0);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ASC&page=999999909",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "999999909"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "10_get_not_user_posts_number_of_posts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json()\r",
+									"var postsData = jsonData.data;\r",
+									"var postsNumberOnePage = 4 // количество своих постов на одной странице в овтете от API \r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 10 | Отправка запроса на свои посты, query param \\\"page\\\"=1: количество чужих постов в списке data.length=4 на одной странице\", function () {\r",
+									"    pm.expect(postsData.length).to.eql(postsNumberOnePage);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ASC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "11_12_13_check_not_user_posts_ASC_sort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function makeRequest(setOptions) {\r",
+									"  return new Promise((resolve, reject) => {\r",
+									"    pm.sendRequest(setOptions, (err, res) => {\r",
+									"      if (err) {\r",
+									"        reject(err);\r",
+									"      } else {\r",
+									"        resolve(res);\r",
+									"      }\r",
+									"    });\r",
+									"  });\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function testFieldsAndTypesGetPosts(testName, jsResponsesList){\r",
+									"    pm.test(testName, function () {\r",
+									"        for (let i = 0; i < jsResponsesList.length; i++){\r",
+									"            pm.expect(jsResponsesList[i]).to.be.an('object');\r",
+									"            pm.expect(jsResponsesList[i].data).to.be.an('array').that.is.not.empty;\r",
+									"            for (let k = 0; k < jsResponsesList[i].data.length; k++){\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('id').that.is.an('number');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('title').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('description').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('content').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('authorId').that.is.an('number');\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage).to.be.an('object');\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage).to.have.property('id');\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage.id === null || typeof(jsResponsesList[i].data[k].mainImage.id) === 'number').to.eql(true);\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage).to.have.property('cdnUrl').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('updatedAt').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('createdAt').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('labels').that.is.an('array');\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('delayPublishTo');\r",
+									"                pm.expect(jsResponsesList[i].data[k].delayPublishTo === null || typeof(jsResponsesList[i].data[k].delayPublishTo) === 'string').to.eql(true);\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('draft').that.is.an('boolean');\r",
+									"            }\r",
+									"            pm.expect(jsResponsesList[i].meta).to.be.an('object');\r",
+									"\r",
+									"            pm.expect(jsResponsesList[i].meta).to.have.property('prevPage').that.is.an('string');\r",
+									"\r",
+									"            pm.expect(jsResponsesList[i].meta).to.have.property('nextPage');\r",
+									"            if ( i != jsResponsesList.length-1){\r",
+									"                pm.expect(typeof(jsResponsesList[i].meta.nextPage) === 'string').to.eql(true);\r",
+									"            } else {\r",
+									"                pm.expect(jsResponsesList[i].meta.nextPage === null).to.eql(true);\r",
+									"            }\r",
+									"\r",
+									"            pm.expect(jsResponsesList[i].meta).to.have.property('count').that.is.an('number');        \r",
+									"        }\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"function randomIntFromInterval(min, max) {\r",
+									"    return Math.floor(Math.random() * (max - min + 1) + min)\r",
+									"}\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"var fieldAuthorName = \"authorId\";\r",
+									"var fieldDateName = \"createdAt\";\r",
+									"\r",
+									"var postsTotalCount = jsonData.meta.count;\r",
+									"var postsOnePageCount = 4; // отталкиваемся от текущей реализации в количестве постов на одной странице, иначе не получим все страницы с постами пользователя\r",
+									"var requestsCount = postsTotalCount % postsOnePageCount ? Math.floor(postsTotalCount / postsOnePageCount) + 1 : postsTotalCount / postsOnePageCount; // число необходимых запроов, чтобы получить все посты\r",
+									"\r",
+									"var randomPages = []\r",
+									"for (let j=0; j<48; j++){\r",
+									"    while(true){\r",
+									"        let rndPage = randomIntFromInterval(2, requestsCount-1)\r",
+									"        if (!randomPages.includes(rndPage)){\r",
+									"            randomPages.push(rndPage)\r",
+									"            break\r",
+									"        }\r",
+									"    }        \r",
+									"}\r",
+									"randomPages.push(requestsCount)\r",
+									"\r",
+									"randomPages.sort((a, b) => {\r",
+									"    return a-b\r",
+									"})\r",
+									"\r",
+									"\r",
+									"var allResponses = []; //сюда будем сохранять респонсы для проверки\r",
+									"allResponses.push(jsonData);\r",
+									"\r",
+									"\r",
+									"(async () =>  {\r",
+									"    for (let i=0; i < randomPages.length; i++){\r",
+									"        const options = {\r",
+									"            url : \"https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ASC&page=\" + randomPages[i],\r",
+									"            method : \"GET\",\r",
+									"            header : {\"X-Auth-Token\" : pm.collectionVariables.get(\"X-Auth-Token\")}\r",
+									"        };\r",
+									"        await makeRequest(options).then(response => {\r",
+									"            let jsData = response.json();\r",
+									"            allResponses.push(jsData)\r",
+									"        });\r",
+									"    }\r",
+									"\r",
+									"\r",
+									"    var allPosts = []; // сюда вытащим все посты объекты из респонсов\r",
+									"    allResponses.forEach(element => element[\"data\"].forEach(post => allPosts.push(post)));\r",
+									"\r",
+									"\r",
+									"    var successfulParseCases = [];\r",
+									"    allPosts.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])));\r",
+									"    var allDatesIsValid = successfulParseCases.every(true);\r",
+									"\r",
+									"    \r",
+									"    pm.test(\"Тест 11(1) | Проверка формата даты и корректности даты\", function(){\r",
+									"        pm.expect(allDatesIsValid).to.eql(true)\r",
+									"    })\r",
+									"\r",
+									"\r",
+									"    pm.test(\"Тест 12 | Получение всех чужих постов (ASC): Сортировка постов по полю createdAt - от старых к новым:\", function(){\r",
+									"        var isSorted = true\r",
+									"        if (allDatesIsValid){\r",
+									"            isSorted = isSortedByDate(allPosts, fieldDateName, \"ASC\")\r",
+									"        } else {\r",
+									"            isSorted = false\r",
+									"        }\r",
+									"        pm.expect(isSorted).to.eql(true)\r",
+									"    })\r",
+									"\r",
+									"    testFieldsAndTypesGetPosts(\"Тест 13 | Получение всех чужих постов (ASC): наличие всех полей в респонсах и их тип\", allResponses)\r",
+									"\r",
+									"\r",
+									"})();\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ASC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "11_14_15_check_not_user_posts_DESC_sort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function makeRequest(setOptions) {\r",
+									"  return new Promise((resolve, reject) => {\r",
+									"    pm.sendRequest(setOptions, (err, res) => {\r",
+									"      if (err) {\r",
+									"        reject(err);\r",
+									"      } else {\r",
+									"        resolve(res);\r",
+									"      }\r",
+									"    });\r",
+									"  });\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function testFieldsAndTypesGetPosts(testName, jsResponsesList){\r",
+									"    pm.test(testName, function () {\r",
+									"        for (let i = 0; i < jsResponsesList.length; i++){\r",
+									"            pm.expect(jsResponsesList[i]).to.be.an('object');\r",
+									"            pm.expect(jsResponsesList[i].data).to.be.an('array').that.is.not.empty;\r",
+									"            for (let k = 0; k < jsResponsesList[i].data.length; k++){\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('id').that.is.an('number');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('title').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('description').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('content').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('authorId').that.is.an('number');\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage).to.be.an('object');\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage).to.have.property('id');\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage.id === null || typeof(jsResponsesList[i].data[k].mainImage.id) === 'number').to.eql(true);\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k].mainImage).to.have.property('cdnUrl').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('updatedAt').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('createdAt').that.is.an('string');\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('labels').that.is.an('array');\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('delayPublishTo');\r",
+									"                pm.expect(jsResponsesList[i].data[k].delayPublishTo === null || typeof(jsResponsesList[i].data[k].delayPublishTo) === 'string').to.eql(true);\r",
+									"\r",
+									"                pm.expect(jsResponsesList[i].data[k]).to.have.property('draft').that.is.an('boolean');\r",
+									"            }\r",
+									"            pm.expect(jsResponsesList[i].meta).to.be.an('object');\r",
+									"\r",
+									"            pm.expect(jsResponsesList[i].meta).to.have.property('prevPage').that.is.an('string');\r",
+									"\r",
+									"            pm.expect(jsResponsesList[i].meta).to.have.property('nextPage');\r",
+									"            if ( i != jsResponsesList.length-1){\r",
+									"                pm.expect(typeof(jsResponsesList[i].meta.nextPage) === 'string').to.eql(true);\r",
+									"            } else {\r",
+									"                pm.expect(jsResponsesList[i].meta.nextPage === null).to.eql(true);\r",
+									"            }\r",
+									"\r",
+									"            pm.expect(jsResponsesList[i].meta.nextPage === null || typeof(jsResponsesList[i].meta.nextPage) === 'string').to.eql(true);\r",
+									"\r",
+									"            pm.expect(jsResponsesList[i].meta).to.have.property('count').that.is.an('number');        \r",
+									"        }\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"function randomIntFromInterval(min, max) {\r",
+									"    return Math.floor(Math.random() * (max - min + 1) + min)\r",
+									"}\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"var fieldAuthorName = \"authorId\";\r",
+									"var fieldDateName = \"createdAt\";\r",
+									"\r",
+									"var postsTotalCount = jsonData.meta.count;\r",
+									"var postsOnePageCount = 4; // отталкиваемся от текущей реализации в количестве постов на одной странице, иначе не получим все страницы с постами пользователя\r",
+									"var requestsCount = postsTotalCount % postsOnePageCount ? Math.floor(postsTotalCount / postsOnePageCount) + 1 : postsTotalCount / postsOnePageCount; // число необходимых запроов, чтобы получить все посты\r",
+									"\r",
+									"var randomPages = []\r",
+									"for (let j=0; j<48; j++){\r",
+									"    while(true){\r",
+									"        let rndPage = randomIntFromInterval(2, requestsCount-1)\r",
+									"        if (!randomPages.includes(rndPage)){\r",
+									"            randomPages.push(rndPage)\r",
+									"            break\r",
+									"        }\r",
+									"    }        \r",
+									"}\r",
+									"randomPages.push(requestsCount)\r",
+									"\r",
+									"randomPages.sort((a, b) => {\r",
+									"    return a-b\r",
+									"})\r",
+									"\r",
+									"\r",
+									"var allResponses = []; //сюда будем сохранять респонсы для проверки\r",
+									"allResponses.push(jsonData); // добавили первый запрос\r",
+									"\r",
+									"\r",
+									"(async () =>  {\r",
+									"    for (let i=0; i < randomPages.length; i++){\r",
+									"        const options = {\r",
+									"            url : \"https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=DESC&page=\" + randomPages[i],\r",
+									"            method : \"GET\",\r",
+									"            header : {\"X-Auth-Token\" : pm.collectionVariables.get(\"X-Auth-Token\")}\r",
+									"        };\r",
+									"        await makeRequest(options).then(response => {\r",
+									"            let jsData = response.json();\r",
+									"            allResponses.push(jsData)\r",
+									"        });\r",
+									"    }\r",
+									"\r",
+									"    var allPosts = []; // сюда вытащим все посты объекты из респонсов\r",
+									"    allResponses.forEach(element => element[\"data\"].forEach(post => allPosts.push(post)));\r",
+									"\r",
+									"\r",
+									"    var successfulParseCases = [];\r",
+									"    allPosts.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])));\r",
+									"    var allDatesIsValid = successfulParseCases.every(true);\r",
+									"\r",
+									"    \r",
+									"    pm.test(\"Тест 11(2) | Проверка формата даты и корректности даты\", function(){\r",
+									"        pm.expect(allDatesIsValid).to.eql(true)\r",
+									"    })\r",
+									"\r",
+									"\r",
+									"    pm.test(\"Тест 14 | Получение всех чужих постов (DESC): Сортировка постов по полю createdAt - от новых к старым\", function(){\r",
+									"        var isSorted = true\r",
+									"        if (allDatesIsValid){\r",
+									"            isSorted = isSortedByDate(allPosts, fieldDateName, \"DESC\")\r",
+									"        } else {\r",
+									"            isSorted = false\r",
+									"        }\r",
+									"        pm.expect(isSorted).to.eql(true)\r",
+									"    })\r",
+									"\r",
+									"\r",
+									"    pm.test(\"Тест 15 | Получение всех чужих постов (DESC), в ответах нет постов пользователя (authorId != userId)\", function () {\r",
+									"        var isNotUserPosts = true;\r",
+									"        var userIdForCheck = pm.collectionVariables.get(\"userId\");\r",
+									"        for (let k = 0; k < allPosts.length; k++){\r",
+									"            if (allPosts[k][fieldAuthorName] == userIdForCheck){\r",
+									"                isNotUserPosts = false;\r",
+									"                break;\r",
+									"            }\r",
+									"        }\r",
+									"        pm.expect(isNotUserPosts).to.eql(true);\r",
+									"    })\r",
+									"\r",
+									"\r",
+									"})();\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=DESC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "DESC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "16_17_check_not_user_posts_ALL_sort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"allPosts = jsonData.data\r",
+									"var fieldDateName = \"createdAt\";\r",
+									"\r",
+									"pm.test(\"Тест 16, 17: статус код 200\", function () {\r",
+									"     pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"var successfulParseCases = [];\r",
+									"allPosts.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])));\r",
+									"var allDatesIsValid = successfulParseCases.every(true);\r",
+									"\r",
+									"pm.test(\"Тест 16 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 16 | Получение всех чужих постов (ALL): нет сортировки постов по полю createdAt - ни от старых к новым(ASC), ни от новых к старым (DESC)\", function(){\r",
+									"    var notSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        notSorted = !(isSortedByDate(allPosts, fieldDateName, \"ASC\") || isSortedByDate(allPosts, fieldDateName, \"DESC\"))\r",
+									"    } else {\r",
+									"        notSorted = false\r",
+									"    }\r",
+									"    pm.expect(notSorted).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 17: Проверка получения всех постов (ALL): jsonData.data.length = jsonData.meta.count\", function () {\r",
+									"     pm.expect(jsonData).to.be.an('object');\r",
+									"     pm.expect(jsonData.data).to.exist.and.to.be.an('array');\r",
+									"     pm.expect(jsonData.meta).to.exist.and.to.be.an('object');\r",
+									"     pm.expect(jsonData.data.length).to.equal(jsonData.meta.count);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ALL&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ALL"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "18_get_not_user_posts_owner_is_allUsers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 18.1 | Отправка запроса c query param owner=allUsers: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 18.2 | Отправка запроса c query param owner=allUsers: в ответе первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 18.3 | Отправка запроса c query param owner=allUsers: в ответе по дефолту только посты автора (authorId = userId)\", function () {\r",
+									"    var isUserPosts = true\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\")\r",
+									"    for  (let i = 0; i < postsData.length; i++){\r",
+									"        if (!(postsData[i][\"authorId\"] == userIdForCheck)){\r",
+									"            isUserPosts = false\r",
+									"            break\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\"\r",
+									"var successfulParseCases = []\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])))\r",
+									"var allDatesIsValid = successfulParseCases.every(true)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 18.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 18.5 | Сортировка постов по полю createdAt - DESC:\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"DESC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=allUsers&sort=createdAt&order=DESC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "allUsers"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "DESC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "19_get_not_user_posts_sort_is_updatedAt",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 19.1 | Отправка запроса c query param sort=updatedAt: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 19.2 | Отправка запроса c query param sort=updatedAt: в ответе первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 19.3 | Отправка запроса c query param sort=updatedAt: в ответе только чужие посты (authorId != userId)\", function () {\r",
+									"    var isNotUserPosts = true\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\")\r",
+									"    for  (let i = 0; i < postsData.length; i++){\r",
+									"        if (postsData[i][\"authorId\"] == userIdForCheck){\r",
+									"            isNotUserPosts = false\r",
+									"            break\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isNotUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\"\r",
+									"var successfulParseCases = []\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])))\r",
+									"var allDatesIsValid = successfulParseCases.every(true)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 19.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 19.5 | Сортировка постов по полю createdAt (т.е. по умолчанию) - ASC:\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"ASC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=updatedAt&order=ASC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "updatedAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "20_get_not_user_posts_order_is_ABC",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 20.1 | Отправка запроса c query param order=ABC: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 20.2 | Отправка запроса c query param order=ABC: в ответе первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 20.3 | Отправка запроса c query param order=ABC: в ответе только чужие посты (authorId != userId)\", function () {\r",
+									"    var isNotUserPosts = true\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\")\r",
+									"    for  (let i = 0; i < postsData.length; i++){\r",
+									"        if (postsData[i][\"authorId\"] == userIdForCheck){\r",
+									"            isNotUserPosts = false\r",
+									"            break\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isNotUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\"\r",
+									"var successfulParseCases = []\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])))\r",
+									"var allDatesIsValid = successfulParseCases.every(true)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 20.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 20.5 | Сортировка постов по полю createdAt (т.е. по умолчанию) - ASC:\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"ASC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ABC&page=1",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ABC"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "21_get_not_user_posts_page_is_random",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"function isSortedByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    for (let i=0; i < listOfObjects.length-1; i++){\r",
+									"        if (compareDate(listOfObjects[i][fieldDate], listOfObjects[i+1][fieldDate], order) > 0){\r",
+									"            return false;\r",
+									"        }\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function sortByDate(listOfObjects, fieldDate, order=\"ASC\"){\r",
+									"    listOfObjects.sort((obj1, obj2) => compareDate(obj1[fieldDate], obj2[fieldDate], order));\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function compareDate(stringDate1, stringDate2, order=\"ASC\"){\r",
+									"\r",
+									"    var date1 = new Date(stringDate1);\r",
+									"    var date2 = new Date(stringDate2);\r",
+									"\r",
+									"    if (order == \"ASC\"){\r",
+									"        return date1 - date2;\r",
+									"    }\r",
+									"    else if (order == \"DESC\"){\r",
+									"        return date2 - date1;\r",
+									"    }\r",
+									"    else{\r",
+									"        throw new Error('compareDate: указано неверное значение параметра \"order\"');\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"// Функция валидирует дату по длине, разделительным символам и их количеству\r",
+									"function isValidDateFormat(stringDate){\r",
+									"    if (isNaN(stringDate) && stringDate.length == 25) {\r",
+									"        var splitDateAndTime = stringDate.split(\"T\");\r",
+									"        if (splitDateAndTime.length == 2){\r",
+									"            var splitDate = splitDateAndTime[0].split(\"-\");\r",
+									"            if (splitDate.length == 3){\r",
+									"                var splitTime = splitDateAndTime[1].slice(0, 8).split(\":\");\r",
+									"                var timeZone = splitDateAndTime[1].slice(-6);\r",
+									"                if (splitTime.length == 3 && timeZone.length == 6 && timeZone.split(\":\").length == 2){\r",
+									"                    return true;\r",
+									"                } else {\r",
+									"                    return false;\r",
+									"                }\r",
+									"            } else {\r",
+									"                return false;\r",
+									"            }\r",
+									"        } else {\r",
+									"            return false;\r",
+									"        }\r",
+									"    } else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"function isValidDate(inputStringDate){\r",
+									"    if (isValidDateFormat(inputStringDate)){\r",
+									"        return !isNaN(Date.parse(inputStringDate));\r",
+									"    }\r",
+									"    else {\r",
+									"        return false;\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"var postsData = jsonData.data;\r",
+									"\r",
+									"pm.test(\"Тест 21.1 | Отправка запроса c query param page=random: статус код 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Тест 21.2 | Отправка запроса c query param page=random: в ответе первая страница с постами (prevPage = 1)\", function () {\r",
+									"    pm.expect(jsonData.meta.prevPage).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 21.3 | Отправка запроса c query param page=random: в ответе только чужие посты (authorId != userId)\", function () {\r",
+									"    var isNotUserPosts = true\r",
+									"    var userIdForCheck = pm.collectionVariables.get(\"userId\")\r",
+									"    for  (let i = 0; i < postsData.length; i++){\r",
+									"        if (postsData[i][\"authorId\"] == userIdForCheck){\r",
+									"            isNotUserPosts = false\r",
+									"            break\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(isNotUserPosts).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"var fieldDateName = \"createdAt\"\r",
+									"var successfulParseCases = []\r",
+									"postsData.forEach(element => successfulParseCases.push(isValidDate(element[fieldDateName])))\r",
+									"var allDatesIsValid = successfulParseCases.every(true)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тест 21.4 | Проверка формата даты и корректности даты\", function(){\r",
+									"    pm.expect(allDatesIsValid).to.eql(true)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тест 21.5 | Сортировка постов по полю createdAt (т.е. по умолчанию) - ASC:\", function(){\r",
+									"    var isSorted = true\r",
+									"    if (allDatesIsValid){\r",
+									"        isSorted = isSortedByDate(postsData, fieldDateName, \"ASC\")\r",
+									"    } else {\r",
+									"        isSorted = false\r",
+									"    }\r",
+									"    pm.expect(isSorted).to.eql(true)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{X-Auth-Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ASC&page=random",
+							"protocol": "https",
+							"host": [
+								"test-stand",
+								"gb",
+								"ru"
+							],
+							"path": [
+								"api",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "notMe"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "page",
+									"value": "random"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "X-Auth-Token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userLogin",
+			"value": "user_polar_wolf_590033",
+			"type": "string"
+		},
+		{
+			"key": "userPassword",
+			"value": "2e593e01ee",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
